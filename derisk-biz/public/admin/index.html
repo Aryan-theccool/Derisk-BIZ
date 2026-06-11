@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#070b14" />
+  <title>Admin — DeRisk.biz Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='80' font-size='80'&gt;🛡️&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- ════════ LOGIN GATE ════════ -->
+  <div class="login-wrap" id="loginWrap">
+    <div class="login-card">
+      <div class="brand big">
+        <span class="brand-logo">
+          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        </span>
+        <span>DeRisk<em>.biz</em></span>
+      </div>
+      <h1>Admin Dashboard</h1>
+      <p class="login-sub">Enter your admin token to manage submissions, leads &amp; consultation requests.</p>
+      <form id="loginForm">
+        <div class="token-row">
+          <input type="password" id="tokenInput" placeholder="Admin token" autocomplete="current-password" required />
+          <button type="button" class="eye-btn" id="toggleToken" aria-label="Show token">👁</button>
+        </div>
+        <label class="remember"><input type="checkbox" id="rememberToken" checked /> Keep me signed in on this device</label>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">🔐 Sign In</button>
+        <p class="form-msg" id="loginMsg"></p>
+      </form>
+      <p class="login-hint">Token is set via <code>ADMIN_TOKEN</code> in <code>.env</code> (default for local demo: <code>derisk-admin</code>).</p>
+      <a class="back-link" href="/">← Back to website</a>
+    </div>
+  </div>
+
+  <!-- ════════ DASHBOARD ════════ -->
+  <div class="dash hidden" id="dash">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="/">
+        <span class="brand-logo">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        </span>
+        <span>DeRisk<em>.biz</em></span>
+      </a>
+      <span class="admin-tag">ADMIN PANEL</span>
+      <nav class="side-nav">
+        <button class="side-link active" data-view="overview"><span>📊</span> Overview</button>
+        <button class="side-link" data-view="submissions"><span>📋</span> Submissions <b class="count-pill" id="pillSubs">0</b></button>
+        <button class="side-link" data-view="contacts"><span>📨</span> Contacts <b class="count-pill" id="pillContacts">0</b></button>
+        <button class="side-link" data-view="settings"><span>⚙️</span> Settings</button>
+      </nav>
+      <div class="side-bottom">
+        <div class="storage-chip" id="storageChip">…</div>
+        <a class="side-link" href="/" target="_blank"><span>🌐</span> View Website</a>
+        <button class="side-link danger" id="logoutBtn"><span>🚪</span> Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <header class="topbar">
+        <button class="hamburger" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+        <h2 id="viewTitle">Overview</h2>
+        <div class="topbar-right">
+          <button class="btn btn-ghost btn-sm" id="refreshBtn">⟳ Refresh</button>
+          <span class="live-dot" title="Connected"></span>
+        </div>
+      </header>
+
+      <!-- ─── OVERVIEW ─── -->
+      <section class="view" id="view-overview">
+        <div class="stat-grid" id="statGrid"></div>
+        <div class="panel-grid">
+          <div class="panel">
+            <h3>Submissions — last 14 days</h3>
+            <div class="bar-chart" id="barChart"></div>
+          </div>
+          <div class="panel">
+            <h3>Vulnerability profile distribution</h3>
+            <div class="risk-bars" id="riskBars"></div>
+            <div class="avg-score" id="avgScore"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Latest activity</h3>
+          <div class="table-scroll"><table class="tbl" id="recentTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ─── SUBMISSIONS ─── -->
+      <section class="view hidden" id="view-submissions">
+        <div class="toolbar">
+          <input type="search" id="subSearch" placeholder="🔍 Search email, name, company…" />
+          <select id="subFilter">
+            <option value="all">All risk levels</option>
+            <option value="High Vulnerability">High Vulnerability</option>
+            <option value="Moderate Vulnerability">Moderate Vulnerability</option>
+            <option value="Low Vulnerability">Low Vulnerability</option>
+          </select>
+          <button class="btn btn-primary btn-sm" id="exportSubs">⬇ Export CSV</button>
+        </div>
+        <div class="table-scroll"><table class="tbl" id="subsTable"></table></div>
+        <p class="empty-msg hidden" id="subsEmpty">No submissions yet — they'll appear here as soon as someone completes the assessment.</p>
+      </section>
+
+      <!-- ─── CONTACTS ─── -->
+      <section class="view hidden" id="view-contacts">
+        <div class="toolbar">
+          <input type="search" id="conSearch" placeholder="🔍 Search name, email, company…" />
+          <select id="conFilter">
+            <option value="all">All messages</option>
+            <option value="consult">Wants consultation 🎁</option>
+            <option value="no-consult">No consultation</option>
+          </select>
+          <button class="btn btn-primary btn-sm" id="exportContacts">⬇ Export CSV</button>
+        </div>
+        <div class="table-scroll"><table class="tbl" id="contactsTable"></table></div>
+        <p class="empty-msg hidden" id="contactsEmpty">No contact messages yet.</p>
+      </section>
+
+      <!-- ─── SETTINGS ─── -->
+      <section class="view hidden" id="view-settings">
+        <div class="panel">
+          <h3>Server &amp; storage</h3>
+          <div class="kv" id="settingsInfo"></div>
+        </div>
+        <div class="panel">
+          <h3>Quick exports</h3>
+          <div class="btn-row">
+            <button class="btn btn-ghost" id="exportSubs2">⬇ Submissions CSV</button>
+            <button class="btn btn-ghost" id="exportContacts2">⬇ Contacts CSV</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Security notes</h3>
+          <ul class="notes">
+            <li>Set a strong <code>ADMIN_TOKEN</code> in <code>.env</code> — the default <code>derisk-admin</code> is for local demo only.</li>
+            <li>All admin API calls require the <code>X-Admin-Token</code> header; invalid tokens get <code>401</code>.</li>
+            <li>This page is <code>noindex</code> and never linked from the public site.</li>
+            <li>Data lives in MongoDB Atlas (free M0) when <code>MONGODB_URI</code> is set, else <code>data/local-db.json</code>.</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ════════ DETAIL DRAWER ════════ -->
+  <div class="drawer-overlay hidden" id="drawerOverlay"></div>
+  <aside class="drawer hidden" id="drawer">
+    <div class="drawer-head">
+      <h3 id="drawerTitle">Details</h3>
+      <button class="close-btn" id="drawerClose" aria-label="Close">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <!-- ════════ CONFIRM MODAL ════════ -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal">
+      <h3>Delete this record?</h3>
+      <p id="modalText">This action cannot be undone.</p>
+      <div class="btn-row end">
+        <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+        <button class="btn btn-danger" id="modalConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="admin.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0a0e28488338b91',t:'MTc4MTE4MzcyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
