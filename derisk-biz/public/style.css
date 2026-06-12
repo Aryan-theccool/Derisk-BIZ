@@ -47,7 +47,7 @@ img, svg { vertical-align: middle; }
   border-bottom: 1px solid rgba(248, 113, 113, 0.25);
   overflow: hidden;
 }
-.ticker-top { top: 0; }
+.ticker-top { position: relative; top: auto; z-index: 850; border-bottom: 1px solid rgba(248, 113, 113, 0.25); }
 .ticker-bottom { bottom: 0; top: auto; border-bottom: none; border-top: 1px solid rgba(248, 113, 113, 0.25); }
 .ticker-badge {
   flex: 0 0 auto; display: flex; align-items: center;
@@ -58,17 +58,21 @@ img, svg { vertical-align: middle; }
 }
 .ticker-viewport { flex: 1; overflow: hidden; display: flex; align-items: center; }
 .ticker-track {
-  display: inline-flex; align-items: center; white-space: nowrap;
-  animation: marquee 60s linear infinite;
+  display: flex;
+  width: 100%;
   will-change: transform;
 }
-.ticker-track.reverse { animation-name: marquee-rev; animation-duration: 70s; }
-.ticker:hover .ticker-track { animation-play-state: paused; }
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@keyframes marquee-rev { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 .ticker-item {
   color: #fde8e8; font-size: 0.85rem; font-weight: 600;
-  padding: 0 1.6rem; display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 1.6rem; display: flex; align-items: center; justify-content: center; gap: 8px;
+  flex: 0 0 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+.ticker-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .ticker-item:hover { color: var(--gold); }
 .ticker-item .dot { color: var(--danger); font-size: 0.7rem; }
