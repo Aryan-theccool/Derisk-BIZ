@@ -7,17 +7,81 @@
   const $ = (s) => document.querySelector(s);
   const startTime = Date.now();
 
-  /* ─────────── News tickers (top + bottom, clickable) ─────────── */
-  function buildTicker(el) {
-    if (!el) return;
-    const items = NEWS_TICKERS.map(
-      (n) =>
-        `<a class="ticker-item" href="${n.url}" target="_blank" rel="noopener noreferrer"><span class="dot">●</span>${n.text}</a>`
-    ).join('');
-    el.innerHTML = items + items; // duplicate for seamless loop
+  /* ─────────── News Ticker Web Component ─────────── */
+  class NewsTicker extends HTMLElement {
+    connectedCallback() {
+      const isReverse = this.hasAttribute('reverse');
+      const badgeText = this.getAttribute('badge') || '⚠ AI RISK NEWS';
+
+      this.className = `ticker ${isReverse ? 'ticker-bottom' : 'ticker-top'}`;
+      this.setAttribute('aria-label', `Breaking news ticker ${isReverse ? 'bottom' : 'top'}`);
+
+      const itemsHtml = NEWS_TICKERS.map(
+        (n) =>
+          `<a class="ticker-item" href="${n.url}" target="_blank" rel="noopener noreferrer"><span class="dot">●</span><span class="ticker-text">${n.text}</span></a>`
+      ).join('');
+
+      this.innerHTML = `
+        <span class="ticker-badge">${badgeText}</span>
+        <div class="ticker-viewport">
+          <div class="ticker-track">
+            ${itemsHtml}
+          </div>
+        </div>
+      `;
+
+      const track = this.querySelector('.ticker-track');
+      const items = Array.from(track.querySelectorAll('.ticker-item'));
+      if (items.length === 0) return;
+
+      // Clone the first item to the end for seamless looping
+      const firstClone = items[0].cloneNode(true);
+      track.appendChild(firstClone);
+
+      const totalItems = items.length;
+      let currentIndex = 0;
+      let timer = null;
+
+      const slideNext = () => {
+        currentIndex++;
+        track.style.transition = 'transform 0.5s ease-in-out';
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        if (currentIndex === totalItems) {
+          // After transition ends, snap back to index 0 with transition disabled
+          setTimeout(() => {
+            track.style.transition = 'none';
+            currentIndex = 0;
+            track.style.transform = 'translateX(0)';
+          }, 500); // must match the 0.5s transition duration
+        }
+      };
+
+      const startTimer = () => {
+        if (!timer) {
+          timer = setInterval(slideNext, 3000);
+        }
+      };
+
+      const stopTimer = () => {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      };
+
+      // Set initial transition styles
+      track.style.transition = 'transform 0.5s ease-in-out';
+      track.style.transform = 'translateX(0)';
+
+      startTimer();
+
+      // Pause animation on hover
+      this.addEventListener('mouseenter', stopTimer);
+      this.addEventListener('mouseleave', startTimer);
+    }
   }
-  buildTicker($('#tickerTop'));
-  buildTicker($('#tickerBottom'));
+  customElements.define('news-ticker', NewsTicker);
 
   /* Footer news links */
   $('#footerNews').innerHTML = NEWS_TICKERS.map(
