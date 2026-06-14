@@ -489,11 +489,31 @@
         <p class="result-msg"><strong>DeRisk.biz</strong> is a private AI risk intelligence layer for CXOs — deployable inside your own network. To know how it can be deployed within your organization, at what cost and timeline → <a href="mailto:info@derisk.biz">info@derisk.biz</a></p>
         <div class="complete-actions">
           <a class="btn btn-primary" href="#consult">🎁 Claim FREE 30-min CXO Consultation</a>
+          <button class="btn btn-linkedin" id="shareLinkedIn">🔗 Share on LinkedIn</button>
           <a class="btn btn-ghost" href="#contact">Contact Us</a>
         </div>
       </div>`;
     resultsPanel.classList.remove('hidden');
     scrollToSurvey();
+
+    const shareBtn = $('#shareLinkedIn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', () => {
+        const surveyName = (state.completed.legal && !state.completed.governance)
+          ? 'Legal AI vs Enterprise Risk AI Assessment'
+          : 'Governance Vulnerability Assessment';
+        const text = `I recently completed the ${surveyName} by @deriskdotbiz and found it to be a refreshing shift from traditional Enterprise and Legal AI tools.\n\nInstead of focusing only on data and documents, it made me think about hidden governance risks, data silos, and whether Boards can detect issues before regulators or the media do.\n\nWorth exploring for founders, CXOs, investors and directors. Click here for insightful assessment: www.derisk.biz\n\n#CorporateGovernance #RiskManagement #AI #LegalAI #BoardGovernance #EnterpriseAI`;
+        
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('📋 Copied post text! Redirecting to LinkedIn...');
+          setTimeout(() => {
+            window.open('https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.derisk.biz', '_blank');
+          }, 1000);
+        }).catch(() => {
+          window.open('https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.derisk.biz', '_blank');
+        });
+      });
+    }
   }
 
   /* ─────────── Runner nav ─────────── */

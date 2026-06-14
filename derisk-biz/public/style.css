@@ -129,6 +129,8 @@ img, svg { vertical-align: middle; }
 .btn-success:hover { transform: translateY(-2px); background: #166534; box-shadow: 0 10px 30px rgba(21, 128, 61, 0.2); }
 .btn-dark { background: #000000; color: #ffffff; border: none; }
 .btn-dark:hover { transform: translateY(-2px); background: #1e293b; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); }
+.btn-linkedin { background: #0077b5; color: #ffffff; border: none; }
+.btn-linkedin:hover { transform: translateY(-2px); background: #005987; box-shadow: 0 10px 30px rgba(0, 119, 181, 0.2); }
 .btn-ghost { background: var(--bg-2); color: var(--txt); border: 1px solid var(--border); }
 .btn-ghost:hover { background: var(--bg-3); }
 .btn-block { width: 100%; }
