@@ -16,6 +16,7 @@
       this.className = `ticker ${isReverse ? 'ticker-bottom' : 'ticker-top'}`;
       this.setAttribute('aria-label', `Breaking news ticker ${isReverse ? 'bottom' : 'top'}`);
 
+      // Render items twice for a seamless infinite loop
       const itemsHtml = NEWS_TICKERS.map(
         (n) =>
           `<a class="ticker-item" href="${n.url}" target="_blank" rel="noopener noreferrer"><span class="dot">●</span><span class="ticker-text">${n.text}</span></a>`
@@ -26,59 +27,20 @@
         <div class="ticker-viewport">
           <div class="ticker-track">
             ${itemsHtml}
+            ${itemsHtml}
           </div>
         </div>
       `;
 
       const track = this.querySelector('.ticker-track');
-      const items = Array.from(track.querySelectorAll('.ticker-item'));
-      if (items.length === 0) return;
-
-      // Clone the first item to the end for seamless looping
-      const firstClone = items[0].cloneNode(true);
-      track.appendChild(firstClone);
-
-      const totalItems = items.length;
-      let currentIndex = 0;
-      let timer = null;
-
-      const slideNext = () => {
-        currentIndex++;
-        track.style.transition = 'transform 0.5s ease-in-out';
-        track.style.transform = `translateX(-${currentIndex * 100}%)`;
-
-        if (currentIndex === totalItems) {
-          // After transition ends, snap back to index 0 with transition disabled
-          setTimeout(() => {
-            track.style.transition = 'none';
-            currentIndex = 0;
-            track.style.transform = 'translateX(0)';
-          }, 500); // must match the 0.5s transition duration
+      const totalItems = NEWS_TICKERS.length;
+      if (totalItems > 0) {
+        const duration = totalItems * 10; // 10 seconds per item for smooth readable scroll
+        track.style.animation = `continuous-slide ${duration}s linear infinite`;
+        if (isReverse) {
+          track.style.animationDirection = 'reverse';
         }
-      };
-
-      const startTimer = () => {
-        if (!timer) {
-          timer = setInterval(slideNext, 3000);
-        }
-      };
-
-      const stopTimer = () => {
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
-      };
-
-      // Set initial transition styles
-      track.style.transition = 'transform 0.5s ease-in-out';
-      track.style.transform = 'translateX(0)';
-
-      startTimer();
-
-      // Pause animation on hover
-      this.addEventListener('mouseenter', stopTimer);
-      this.addEventListener('mouseleave', startTimer);
+      }
     }
   }
   customElements.define('news-ticker', NewsTicker);
@@ -98,7 +60,7 @@
     { ic: '💰', h: 'Measurable ROI', p: 'Faster decisions, reduced external advisory spend, shorter turnaround times, fewer confidentiality leaks — outcomes a CFO can measure, not AI theatre.' },
   ];
   $('#whyCards').innerHTML = WHY.map(
-    (c) => `<article class="card"><div class="ic">${c.ic}</div><h3>${c.h}</h3><p>${c.p}</p></article>`
+    (c) => `<article class="card"><h3>${c.ic} &nbsp;${c.h}</h3><p>${c.p}</p></article>`
   ).join('');
 
   /* ─────────── Survey state ─────────── */
@@ -114,6 +76,11 @@
   /* Build unified step lists */
   const GOV_STEPS = [
     ...CONTEXT_QUESTIONS.map((q) => ({ kind: 'context', q })),
+    {
+      kind: 'transition',
+      title: 'Part 2: Strategic Governance Scenarios',
+      info: 'In the next 10 questions, you will face scenario-based strategic readiness questions covering board early-warning, regulator notices, M&A diligence, whistleblower reviews, data residency & more.<br><br>Evaluate each scenario carefully and choose the option that best reflects the optimal risk mitigation path.',
+    },
     ...GOVERNANCE_SCENARIOS.map((q) => ({ kind: 'scenario', q })),
   ];
   const LEGAL_STEPS = LEGAL_VS_ENTERPRISE_SCENARIOS.map((q) => ({ kind: 'scenario', q }));
@@ -151,10 +118,21 @@
     const list = steps();
     const step = list[state.stepIndex];
     const q = step.q;
-    const saved = state.answers[state.activeSurvey][q.id] || {};
+    const saved = q ? (state.answers[state.activeSurvey][q.id] || {}) : {};
+
+    let qNum = 0;
+    let totalQs = 0;
+    list.forEach((s, idx) => {
+      if (s.kind !== 'transition') {
+        totalQs++;
+        if (idx <= state.stepIndex) qNum++;
+      }
+    });
 
     progressBar.style.width = `${((state.stepIndex) / list.length) * 100}%`;
-    progressLabel.textContent = `Question ${state.stepIndex + 1} of ${list.length}`;
+    progressLabel.textContent = step.kind === 'transition'
+      ? 'Introduction'
+      : `Question ${qNum} of ${totalQs}`;
     runnerTitle.textContent = state.activeSurvey === 'governance'
       ? 'Governance Vulnerability Assessment'
       : 'Legal AI vs Enterprise Risk AI';
@@ -192,6 +170,12 @@
           html += `<div class="q-feedback incorrect">Incorrect. The correct answer is: <strong>${letter(q.best)}. ${q.options[q.best]}</strong></div>`;
         }
       }
+    } else if (step.kind === 'transition') {
+      html += `<div style="text-align: center; padding: 1.5rem 0;">`;
+      html += `  <div style="font-size: 3.2rem; margin-bottom: 1.2rem;">🎯</div>`;
+      html += `  <div class="q-scn-title" style="font-size: 1.35rem; font-weight: 800; color: var(--accent); margin-bottom: 1.1rem; text-align: center;">${step.title}</div>`;
+      html += `  <p style="font-size: 1.05rem; line-height: 1.6; color: var(--muted); max-width: 560px; margin: 0 auto; text-align: center;">${step.info}</p>`;
+      html += `</div>`;
     } else {
       // context question (single / multi, optional "other")
       html += `<div class="q-scn-title">Section 1 — Context Setting</div>`;
@@ -253,6 +237,7 @@
     if (otherText) {
       otherText.addEventListener('input', () => {
         const qq = steps()[state.stepIndex].q;
+        if (!qq) return;
         const store = state.answers[state.activeSurvey];
         store[qq.id] = { ...(store[qq.id] || {}), other: otherText.value };
       });
@@ -269,6 +254,7 @@
 
   function validateCurrent() {
     const st = steps()[state.stepIndex];
+    if (st.kind === 'transition') return true;
     const a = state.answers[state.activeSurvey][st.q.id];
     if (!a) return false;
     if (st.kind === 'scenario') return typeof a.choice === 'number';
@@ -325,14 +311,18 @@
     const otherLabel = which === 'governance' ? 'Take Assessment 2 — Legal AI vs Enterprise Risk AI' : 'Take Assessment 1 — Governance Vulnerability';
     const otherKey = which === 'governance' ? 'legal' : 'governance';
 
+    const submitLabel = bothDone
+      ? 'Submit All Results →'
+      : (which === 'governance' ? 'Submit Assignment 1 →' : 'Submit Assignment 2 →');
+
     completePanel.innerHTML = `
       <div class="complete-card">
         <div class="big">✅</div>
         <h3>Assessment complete!</h3>
         <p>${msg}</p>
         <div class="complete-actions">
-          ${!state.completed[otherKey] ? `<button class="btn btn-ghost" id="takeOther">${otherLabel}</button>` : ''}
-          <button class="btn btn-primary" id="goEmail">${bothDone ? 'Submit My Results →' : 'Finish & Submit Results →'}</button>
+          <button class="btn btn-success" id="goEmail">${submitLabel}</button>
+          ${!state.completed[otherKey] ? `<button class="btn btn-dark" id="takeOther">${otherLabel}</button>` : ''}
         </div>
       </div>`;
     completePanel.classList.remove('hidden');
@@ -516,9 +506,9 @@
     const step = list[state.stepIndex];
     const q = step.q;
     const store = state.answers[state.activeSurvey];
-    const saved = store[q.id] || {};
+    const saved = q ? (store[q.id] || {}) : {};
 
-    if (step.kind === 'scenario' && !saved.checked) {
+    if (q && step.kind === 'scenario' && !saved.checked) {
       saved.checked = true;
       store[q.id] = saved;
       renderStep();
