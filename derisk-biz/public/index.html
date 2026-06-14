@@ -273,17 +273,21 @@
     <div class="modal-card">
       <button class="modal-close" id="closeShareModal">&times;</button>
       <h3 id="shareModalTitle">Share on LinkedIn</h3>
-      <p class="modal-sub">LinkedIn does not support automatic text pre-filling. We have copied the post message below to your clipboard. Simply paste it (Ctrl+V) when LinkedIn opens!</p>
-      <div class="modal-alert-box" id="shareModalAlert">
-        ⚠️ <strong>Important</strong>: LinkedIn does not allow automatic pre-filling. We have copied the text to your clipboard. Please paste it (Ctrl+V) inside the box when LinkedIn opens.
-      </div>
+      
+      <!-- Step 1 -->
+      <div class="modal-step-title">Step 1: Copy your post message</div>
       <div class="modal-text-container">
         <textarea class="modal-textarea" id="shareModalText" readonly></textarea>
       </div>
-      <div class="modal-actions">
-        <button class="btn btn-primary" id="copyShareText">📋 Copy Text</button>
-        <button class="btn btn-dark" id="proceedToShare">Continue to LinkedIn →</button>
+      <button class="btn btn-primary" id="copyShareText" style="width: 100%; margin-bottom: 1.5rem; font-weight: 800;">📋 Copy Text to Clipboard</button>
+      
+      <!-- Step 2 -->
+      <div class="modal-step-title">Step 2: Paste message on the platform</div>
+      <div class="modal-alert-box" id="shareModalAlert" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">
+        ⚠️ <strong>Note</strong>: LinkedIn does not allow automated text filling. You must paste (<code>Ctrl + V</code> or <code>Cmd + V</code>) the copied text into the post box.
       </div>
+      
+      <button class="btn btn-dark" id="proceedToShare" style="width: 100%; font-weight: 800;">Continue to LinkedIn & Paste →</button>
     </div>
   </div>
 
