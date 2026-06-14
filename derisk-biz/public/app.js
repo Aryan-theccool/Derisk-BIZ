@@ -265,6 +265,10 @@
 
   /* ─────────── Survey flow ─────────── */
   function startSurvey(which) {
+    if (which === 'legal' && !state.completed.governance) {
+      showToast('⚠️ Please complete Assessment 1 (Governance Vulnerability Assessment) first!');
+      return;
+    }
     state.activeSurvey = which;
     state.answers[which] = {};
     state.completed[which] = false;
@@ -489,7 +493,10 @@
         <p class="result-msg"><strong>DeRisk.biz</strong> is a private AI risk intelligence layer for CXOs — deployable inside your own network. To know how it can be deployed within your organization, at what cost and timeline → <a href="mailto:info@derisk.biz">info@derisk.biz</a></p>
         <div class="complete-actions">
           <a class="btn btn-primary" href="#consult">🎁 Claim FREE 30-min CXO Consultation</a>
-          <button class="btn btn-linkedin" id="shareLinkedIn">🔗 Share on LinkedIn</button>
+          <div class="share-row">
+            <button class="btn btn-linkedin" id="shareLinkedIn">🔗 Share on LinkedIn</button>
+            <button class="btn btn-x" id="shareX">🔗 Share on X</button>
+          </div>
           <a class="btn btn-ghost" href="#contact">Contact Us</a>
         </div>
       </div>`;
@@ -511,6 +518,25 @@
           }, 1000);
         }).catch(() => {
           window.open('https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.derisk.biz', '_blank');
+        });
+      });
+    }
+
+    const shareXBtn = $('#shareX');
+    if (shareXBtn) {
+      shareXBtn.addEventListener('click', () => {
+        const surveyName = (state.completed.legal && !state.completed.governance)
+          ? 'Legal AI vs Enterprise Risk AI Assessment'
+          : 'Governance Vulnerability Assessment';
+        const text = `Completed the ${surveyName} by @deriskdotbiz.\n\nInteresting perspective on how AI can connect legal, finance, tax, HR and compliance data to identify governance risks before they become crises.\n\nWorth a look for Boards, CXOs and investors. Click here for insightful assessment: www.derisk.biz\n\n#AI #Governance #RiskManagement #LegalAI #EnterpriseAI`;
+        
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('📋 Copied post text! Redirecting to X...');
+          setTimeout(() => {
+            window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
+          }, 1000);
+        }).catch(() => {
+          window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
         });
       });
     }
