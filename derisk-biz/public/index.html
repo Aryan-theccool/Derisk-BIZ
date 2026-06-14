@@ -10,7 +10,7 @@
   <title>DeRisk.biz — Governance Vulnerability Assessment</title>
   <link rel="icon"
     href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='80' font-size='80'&gt;🛡️&lt;/text&gt;&lt;/svg&gt;" />
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 
 <body>
@@ -268,10 +268,29 @@
   <!-- ════════ BOTTOM NEWS TICKER ════════ -->
   <news-ticker reverse></news-ticker>
 
+  <!-- Share Modal -->
+  <div class="modal-backdrop hidden" id="shareModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeShareModal">&times;</button>
+      <h3 id="shareModalTitle">Share on LinkedIn</h3>
+      <p class="modal-sub">LinkedIn does not support automatic text pre-filling. We have copied the post message below to your clipboard. Simply paste it (Ctrl+V) when LinkedIn opens!</p>
+      <div class="modal-alert-box" id="shareModalAlert">
+        ⚠️ <strong>Important</strong>: LinkedIn does not allow automatic pre-filling. We have copied the text to your clipboard. Please paste it (Ctrl+V) inside the box when LinkedIn opens.
+      </div>
+      <div class="modal-text-container">
+        <textarea class="modal-textarea" id="shareModalText" readonly></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="copyShareText">📋 Copy Text</button>
+        <button class="btn btn-dark" id="proceedToShare">Continue to LinkedIn →</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script src="questions.js"></script>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=6"></script>
 </body>
 
 </html>

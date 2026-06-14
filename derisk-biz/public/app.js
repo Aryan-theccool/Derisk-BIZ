@@ -464,6 +464,108 @@
     return level.startsWith('Low') ? '#34d399' : level.startsWith('Moderate') ? '#fbbf24' : '#f87171';
   }
 
+  function copyTextToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      if (successful) return Promise.resolve();
+      return Promise.reject(new Error('Fallback copy failed'));
+    } catch (err) {
+      document.body.removeChild(textArea);
+      return Promise.reject(err);
+    }
+  }
+
+  function openShareModal(platform, text, shareUrl) {
+    const modal = $('#shareModal');
+    const title = $('#shareModalTitle');
+    const sub = $('.modal-sub');
+    const textarea = $('#shareModalText');
+    const copyBtn = $('#copyShareText');
+    const proceedBtn = $('#proceedToShare');
+    const alertBox = $('#shareModalAlert');
+
+    title.textContent = `Share on ${platform}`;
+    if (platform === 'LinkedIn') {
+      sub.textContent = 'LinkedIn does not allow apps to pre-fill post text. We have copied the post message below to your clipboard. Simply paste it (Ctrl+V or Cmd+V) when LinkedIn opens!';
+      proceedBtn.textContent = 'Continue to LinkedIn →';
+      if (alertBox) {
+        alertBox.innerHTML = `⚠️ <strong>Important</strong>: LinkedIn does not allow automatic pre-filling. We have automatically copied the post message to your clipboard. Please paste it (<code>Ctrl+V</code> or <code>Cmd+V</code>) inside the text box when LinkedIn opens.`;
+        alertBox.style.display = 'block';
+      }
+    } else {
+      sub.textContent = 'Copy the tweet message below to your clipboard. (We will also pre-fill it for you if your browser supports it!)';
+      proceedBtn.textContent = 'Continue to X →';
+      if (alertBox) {
+        alertBox.innerHTML = `🐦 <strong>Pre-filled</strong>: X (Twitter) will automatically open with this text pre-filled. We've also copied it to your clipboard as a backup.`;
+        alertBox.style.display = 'block';
+      }
+    }
+
+    textarea.value = text;
+    modal.classList.remove('hidden');
+
+    // Copy immediately
+    copyTextToClipboard(text).then(() => {
+      copyBtn.textContent = '✅ Copied!';
+    }).catch(() => {
+      copyBtn.textContent = '📋 Copy Text';
+    });
+
+    // Handlers
+    const cleanListeners = () => {
+      copyBtn.replaceWith(copyBtn.cloneNode(true));
+      proceedBtn.replaceWith(proceedBtn.cloneNode(true));
+      $('#closeShareModal').replaceWith($('#closeShareModal').cloneNode(true));
+    };
+
+    const setupModalHandlers = () => {
+      const newCopyBtn = $('#copyShareText');
+      const newProceedBtn = $('#proceedToShare');
+      const newCloseBtn = $('#closeShareModal');
+
+      newCopyBtn.addEventListener('click', () => {
+        copyTextToClipboard(textarea.value).then(() => {
+          newCopyBtn.textContent = '✅ Copied!';
+          showToast('📋 Copied to clipboard!');
+        }).catch(() => {
+          showToast('Could not copy automatically. Please select all and copy.');
+        });
+      });
+
+      newProceedBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        window.open(shareUrl, '_blank');
+        cleanListeners();
+      });
+
+      newCloseBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        cleanListeners();
+      });
+    };
+
+    setupModalHandlers();
+  }
+
   function showResults() {
     emailGate.classList.add('hidden');
     const g = state.results.governance;
@@ -511,14 +613,7 @@
           : 'Governance Vulnerability Assessment';
         const text = `I recently completed the ${surveyName} by @deriskdotbiz and found it to be a refreshing shift from traditional Enterprise and Legal AI tools.\n\nInstead of focusing only on data and documents, it made me think about hidden governance risks, data silos, and whether Boards can detect issues before regulators or the media do.\n\nWorth exploring for founders, CXOs, investors and directors. Click here for insightful assessment: www.derisk.biz\n\n#CorporateGovernance #RiskManagement #AI #LegalAI #BoardGovernance #EnterpriseAI`;
         
-        navigator.clipboard.writeText(text).then(() => {
-          showToast('📋 Copied post text! Redirecting to LinkedIn...');
-          setTimeout(() => {
-            window.open('https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.derisk.biz', '_blank');
-          }, 1000);
-        }).catch(() => {
-          window.open('https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.derisk.biz', '_blank');
-        });
+        openShareModal('LinkedIn', text, 'https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.derisk.biz');
       });
     }
 
@@ -530,14 +625,7 @@
           : 'Governance Vulnerability Assessment';
         const text = `Completed the ${surveyName} by @deriskdotbiz.\n\nInteresting perspective on how AI can connect legal, finance, tax, HR and compliance data to identify governance risks before they become crises.\n\nWorth a look for Boards, CXOs and investors. Click here for insightful assessment: www.derisk.biz\n\n#AI #Governance #RiskManagement #LegalAI #EnterpriseAI`;
         
-        navigator.clipboard.writeText(text).then(() => {
-          showToast('📋 Copied post text! Redirecting to X...');
-          setTimeout(() => {
-            window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
-          }, 1000);
-        }).catch(() => {
-          window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
-        });
+        openShareModal('X (Twitter)', text, 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text));
       });
     }
   }
