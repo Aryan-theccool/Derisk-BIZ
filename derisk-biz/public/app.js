@@ -73,6 +73,46 @@
     submitted: false,
   };
 
+  function saveState() {
+    try {
+      localStorage.setItem('derisk_survey_state_v2', JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function restoreState() {
+    try {
+      const saved = localStorage.getItem('derisk_survey_state_v2');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          Object.keys(parsed).forEach((k) => {
+            if (typeof parsed[k] === 'object' && parsed[k] !== null && state[k]) {
+              Object.assign(state[k], parsed[k]);
+            } else {
+              state[k] = parsed[k];
+            }
+          });
+        }
+      }
+    } catch (e) {}
+    updatePickStatus();
+    if (state.activeSurvey) {
+      surveyPick.classList.add('hidden');
+      if (state.completed[state.activeSurvey]) {
+        if (state.submitted) {
+          showResults();
+        } else {
+          finishSurvey();
+        }
+      } else {
+        runner.classList.remove('hidden');
+        renderStep();
+      }
+    } else {
+      updatePickStatus();
+    }
+  }
+
   /* Build unified step lists */
   const GOV_STEPS = [
     ...CONTEXT_QUESTIONS.map((q) => ({ kind: 'context', q })),
@@ -225,6 +265,7 @@
           store[qq.id] = cur;
           inp.closest('.opt').classList.toggle('selected', inp.checked);
         }
+        saveState();
         const otherText = qCard.querySelector('#otherText');
         if (otherText) {
           const show = (store[qq.id].choice === 'other') || store[qq.id].otherChecked;
@@ -240,6 +281,7 @@
         if (!qq) return;
         const store = state.answers[state.activeSurvey];
         store[qq.id] = { ...(store[qq.id] || {}), other: otherText.value };
+        saveState();
       });
     }
 
@@ -274,6 +316,7 @@
     state.completed[which] = false;
     state.results[which] = null;
     state.stepIndex = 0;
+    saveState();
     surveyPick.classList.add('hidden');
     completePanel.classList.add('hidden');
     emailGate.classList.add('hidden');
@@ -284,6 +327,8 @@
   }
 
   function exitToPick() {
+    state.activeSurvey = null;
+    saveState();
     runner.classList.add('hidden');
     completePanel.classList.add('hidden');
     surveyPick.classList.remove('hidden');
@@ -308,6 +353,7 @@
     const which = state.activeSurvey;
     state.completed[which] = true;
     state.results[which] = computeScore(which);
+    saveState();
     runner.classList.add('hidden');
 
     const msg = which === 'governance' ? GOVERNANCE_COMPLETION_MESSAGE : LEGAL_VS_ENTERPRISE_COMPLETION_MESSAGE;
@@ -432,6 +478,7 @@
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
         state.submitted = true;
+        saveState();
         showResults();
         showToast('✅ Saved! Your results have been recorded.');
       } else {
@@ -505,17 +552,17 @@
 
     title.textContent = `Share on ${platform}`;
     if (platform === 'LinkedIn') {
-      sub.textContent = 'LinkedIn does not allow apps to pre-fill post text. We have copied the post message below to your clipboard. Simply paste it (Ctrl+V or Cmd+V) when LinkedIn opens!';
-      proceedBtn.textContent = 'Continue to LinkedIn →';
+      if (sub) sub.textContent = 'LinkedIn does not allow apps to pre-fill post text. We have copied the post message below to your clipboard. Simply paste it (Ctrl+V or Cmd+V) when LinkedIn opens!';
+      proceedBtn.textContent = 'Continue to LinkedIn & Paste →';
       if (alertBox) {
-        alertBox.innerHTML = `⚠️ <strong>Important</strong>: LinkedIn does not allow automatic pre-filling. We have automatically copied the post message to your clipboard. Please paste it (<code>Ctrl+V</code> or <code>Cmd+V</code>) inside the text box when LinkedIn opens.`;
+        alertBox.innerHTML = `⚠️ <strong>Note</strong>: LinkedIn does not allow automated text filling. You must paste (<code>Ctrl + V</code> or <code>Cmd + V</code>) the copied text into the post box.`;
         alertBox.style.display = 'block';
       }
     } else {
-      sub.textContent = 'Copy the tweet message below to your clipboard. (We will also pre-fill it for you if your browser supports it!)';
-      proceedBtn.textContent = 'Continue to X →';
+      if (sub) sub.textContent = 'Copy the tweet message below to your clipboard. (We will also pre-fill it for you if your browser supports it!)';
+      proceedBtn.textContent = 'Continue to X & Paste →';
       if (alertBox) {
-        alertBox.innerHTML = `🐦 <strong>Pre-filled</strong>: X (Twitter) will automatically open with this text pre-filled. We've also copied it to your clipboard as a backup.`;
+        alertBox.innerHTML = `⚠️ <strong>X (Twitter) App Note</strong>: If your browser redirects to the X app, it may not auto-fill. You must paste (<code>Ctrl + V</code> or <code>Cmd + V</code>) the copied text into the post box.`;
         alertBox.style.display = 'block';
       }
     }
@@ -645,12 +692,14 @@
     if (q && step.kind === 'scenario' && !saved.checked) {
       saved.checked = true;
       store[q.id] = saved;
+      saveState();
       renderStep();
       return;
     }
 
     if (state.stepIndex < list.length - 1) {
       state.stepIndex++;
+      saveState();
       renderStep();
       qCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
@@ -660,6 +709,7 @@
   prevBtn.addEventListener('click', () => {
     if (state.stepIndex > 0) {
       state.stepIndex--;
+      saveState();
       renderStep();
     }
   });
@@ -722,8 +772,10 @@
     'Is Your Company Vulnerable To Internal Governance Risk Due To Hidden Data Patterns? Take the DeRisk.biz Governance Vulnerability Assessment — and tag @derisk.biz for a FREE 30-min CXO consultation!'
   );
   const shareUrl = encodeURIComponent('https://derisk.biz');
-  $('#shareLinkedIn').href = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
-  $('#shareX').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const lShare = $('#shareLinkedIn');
+  if (lShare) lShare.href = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+  const xShare = $('#shareX');
+  if (xShare) xShare.href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
 
   /* ─────────── Misc ─────────── */
   $('#year').textContent = new Date().getFullYear();
@@ -733,4 +785,6 @@
     hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
     navLinks.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => navLinks.classList.remove('open')));
   }
+
+  restoreState();
 })();

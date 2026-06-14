@@ -435,6 +435,17 @@ img, svg { vertical-align: middle; }
 }
 .modal-close:hover { color: var(--txt); }
 .modal-card h3 { font-size: 1.35rem; font-weight: 800; color: var(--txt); margin-bottom: 0.5rem; margin-top: 0; }
+.modal-step-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--muted);
+  margin-top: 1.2rem;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3rem;
+}
 .modal-sub { font-size: 0.95rem; color: var(--muted); line-height: 1.5; margin-bottom: 1.2rem; }
 .modal-alert-box {
   background: rgba(251, 191, 36, 0.1);
