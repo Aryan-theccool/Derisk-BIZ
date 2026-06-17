@@ -119,7 +119,7 @@
     {
       kind: 'transition',
       title: 'Part 2: Strategic Governance Scenarios',
-      info: 'In the next 10 questions, you will face scenario-based strategic readiness questions covering board early-warning, regulator notices, M&A diligence, whistleblower reviews, data residency & more.<br><br>Evaluate each scenario carefully and choose the option that best reflects the optimal risk mitigation path.',
+      info: 'In the next 5 questions, you will face scenario-based strategic readiness questions covering board early-warning, regulator notices, M&A diligence, whistleblower reviews, data residency & more.<br><br>Evaluate each scenario carefully and choose the option that best reflects the optimal risk mitigation path.',
     },
     ...GOVERNANCE_SCENARIOS.map((q) => ({ kind: 'scenario', q })),
   ];
