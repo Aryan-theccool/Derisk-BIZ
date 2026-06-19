@@ -658,7 +658,7 @@
         const surveyName = (state.completed.legal && !state.completed.governance)
           ? 'Legal AI vs Enterprise Risk AI Assessment'
           : 'Governance Vulnerability Assessment';
-        const text = `I recently completed the ${surveyName} by @deriskdotbiz and found it to be a refreshing shift from traditional Enterprise and Legal AI tools.\n\nInstead of focusing only on data and documents, it made me think about hidden governance risks, data silos, and whether Boards can detect issues before regulators or the media do.\n\nWorth exploring for founders, CXOs, investors and directors. Click here for insightful assessment: www.derisk.biz\n\n#CorporateGovernance #RiskManagement #AI #LegalAI #BoardGovernance #EnterpriseAI`;
+        const text = `I recently completed the ${surveyName} by @derisk.biz and found it to be a refreshing shift from traditional Enterprise and Legal AI tools.\n\nInstead of focusing only on data and documents, it made me think about hidden governance risks, data silos, and whether Boards can detect issues before regulators or the media do.\n\nWorth exploring for founders, CXOs, investors and directors. Click here for insightful assessment: www.derisk.biz\n\n#CorporateGovernance #RiskManagement #AI #LegalAI #BoardGovernance #EnterpriseAI`;
         
         openShareModal('LinkedIn', text, 'https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.derisk.biz');
       });
@@ -769,7 +769,7 @@
 
   /* ─────────── Social share links ─────────── */
   const shareText = encodeURIComponent(
-    'Is Your Company Vulnerable To Internal Governance Risk Due To Hidden Data Patterns? Take the DeRisk.biz Governance Vulnerability Assessment — and tag @derisk.biz for a FREE 30-min CXO consultation!'
+    'Is Your Company Vulnerable To Internal Governance Risk Due To Hidden Data Patterns? Take the DeRisk.biz Governance Vulnerability Assessment — and tag @derisk.biz (LinkedIn) or @deriskdotbiz (X-Twitter) for a FREE 30-min CXO consultation!'
   );
   const shareUrl = encodeURIComponent('https://derisk.biz');
   const lShare = $('#shareLinkedIn');
