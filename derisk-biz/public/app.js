@@ -639,7 +639,7 @@
           ${g ? `<div class="rb-item">Governance Vulnerability Assessment<b>${g.score}/${g.max} · ${g.riskLevel}</b></div>` : ''}
           ${l ? `<div class="rb-item">Legal AI vs Enterprise Risk AI<b>${l.score}/${l.max} · ${l.riskLevel}</b></div>` : ''}
         </div>
-        <p class="result-msg"><strong>DeRisk.biz</strong> is a private AI risk intelligence layer for CXOs — deployable inside your own network. To know how it can be deployed within your organization, at what cost and timeline → <a href="mailto:info@derisk.biz">info@derisk.biz</a></p>
+        <p class="result-msg"><strong>DeRisk.biz</strong> is a private AI risk intelligence layer for CXOs — deployable inside your own network. To know how it can be deployed within your organization, at what cost and timeline → <a href="mailto:derisk.biz@gmail.com">derisk.biz@gmail.com</a></p>
         <div class="complete-actions">
           <a class="btn btn-primary" href="#consult">🎁 Claim FREE 30-min CXO Consultation</a>
           <div class="share-row">
@@ -760,7 +760,7 @@
         msgEl.classList.add('err');
       }
     } catch {
-      msgEl.textContent = 'Network error — please email us directly at info@derisk.biz';
+      msgEl.textContent = 'Network error — please email us directly at derisk.biz@gmail.com';
       msgEl.classList.add('err');
     } finally {
       btn.disabled = false; btn.textContent = 'Send Message';

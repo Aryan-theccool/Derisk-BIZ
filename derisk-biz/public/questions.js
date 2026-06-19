@@ -13,19 +13,19 @@ const NEWS_TICKERS = [
   },
   {
     text: "India's Finance Ministry Asks Employees To Avoid AI Tools Like ChatGPT",
-    url: 'https://www.reuters.com/technology/artificial-intelligence/indias-finance-ministry-asks-employees-avoid-ai-tools-like-chatgpt-deepseek-2025-02-05/',
+    url: 'https://www.reuters.com/technology/artificial-intelligence/indias-finance-ministry-asks-employees-avoid-ai-tools-like-chatgpt-deepseek-2025-02-05/?utm_source=chatgpt.com',
   },
   {
     text: 'Indian Businesses Lag In AI Security and Effective Monitoring',
-    url: 'https://economictimes.indiatimes.com/tech/artificial-intelligence/indian-businesses-lag-in-ai-security-81-lack-effective-monitoring-survey/articleshow/125739254.cms?from=mdr',
+    url: 'https://economictimes.indiatimes.com/tech/artificial-intelligence/indian-businesses-lag-in-ai-security-81-lack-effective-monitoring-survey/articleshow/125739254.cms?utm_source=chatgpt.com&from=mdr',
   },
   {
     text: '77% Employees Share Company Secrets on ChatGPT',
-    url: 'https://www.peoplematters.in/news/ai-and-emerging-tech/77percent-of-employees-share-company-secrets-on-chatgpt-report-46778',
+    url: 'https://www.peoplematters.in/news/ai-and-emerging-tech/77percent-of-employees-share-company-secrets-on-chatgpt-report-46778?utm_source=chatgpt.com',
   },
   {
     text: 'Watch Out!! Your Workers Might Be Pasting Company Secrets Into ChatGPT',
-    url: 'https://www.techradar.com/pro/security/watch-out-your-workers-might-be-pasting-company-secrets-into-chatgpt',
+    url: 'https://www.techradar.com/pro/security/watch-out-your-workers-might-be-pasting-company-secrets-into-chatgpt?utm_source=chatgpt.com',
   },
 ];
 
@@ -255,4 +255,4 @@ const LEGAL_VS_ENTERPRISE_SCENARIOS = [
 const LEGAL_VS_ENTERPRISE_COMPLETION_MESSAGE =
   'Most legal AI tools improve legal workflow. DeRisk.biz is designed to help CXOs convert sensitive legal, financial, compliance, contractual, and governance data into private, decision-ready enterprise intelligence.';
 
-const CONTACT_EMAIL = 'info@derisk.biz';
+const CONTACT_EMAIL = 'derisk.biz@gmail.com';

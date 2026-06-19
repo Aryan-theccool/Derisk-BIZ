@@ -391,7 +391,7 @@
       <div class="kv-row"><b>Total submissions</b><span>${stats.submissions}</span></div>
       <div class="kv-row"><b>Total contacts</b><span>${stats.contacts}</span></div>
       <div class="kv-row"><b>Avg score</b><span>${stats.avgScorePct}% best answers</span></div>
-      <div class="kv-row"><b>Site contact</b><span><a href="mailto:info@derisk.biz">info@derisk.biz</a></span></div>`;
+      <div class="kv-row"><b>Site contact</b><span><a href="mailto:derisk.biz@gmail.com">derisk.biz@gmail.com</a></span></div>`;
   }
 
   /* ─────────── CSV export (with auth header) ─────────── */
